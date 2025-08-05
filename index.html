@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Digital Clock</title>
+    <title>Weather & Clock</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @keyframes pulse-soft {
@@ -18,18 +18,32 @@
       .animate-pulse-soft {
         animation: pulse-soft 2s infinite;
       }
+      .fade-in {
+        animation: fadeIn 0.3s ease-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
     </style>
   </head>
   <body
     class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-black p-4 sm:p-6 md:p-10"
   >
+    <!-- Main Container -->
     <div
-      class="flex flex-col md:flex-row items-center justify-center w-full max-w-7xl gap-6"
+      class="flex flex-col md:flex-row items-stretch justify-center w-full max-w-7xl gap-6 min-h-[400px]"
     >
       <!-- Weather Box -->
       <div
         id="weather"
-        class="bg-black/30 backdrop-blur-lg rounded-xl p-3 sm:p-4 text-white w-full sm:w-auto max-w-sm"
+        class="bg-black/30 h-full backdrop-blur-lg rounded-xl p-4 sm:p-6 text-white w-full sm:w-auto max-w-sm"
       >
         <div class="flex items-center space-x-2 mb-2">
           <div id="weather-icon" class="text-2xl sm:text-3xl">⟳</div>
@@ -63,12 +77,22 @@
             <div class="opacity-70">Humidity</div>
             <div id="humidity" class="font-semibold">--%</div>
           </div>
+          <div>
+            <div class="opacity-70">Heat Index in Celsius</div>
+            <div id="heatindex" class="font-semibold">--°C</div>
+          </div>
         </div>
+        <button
+          onclick="openModal()"
+          class="mt-4 w-full bg-purple-600 hover:bg-purple-700 transition text-white px-4 py-2 rounded-lg text-sm font-semibold"
+        >
+          More Weather Details
+        </button>
       </div>
 
       <!-- Clock Box -->
       <div
-        class="clock-container bg-black/30 backdrop-blur-lg rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl border border-white/10 animate-pulse-soft w-full max-w-3xl"
+        class="clock-container bg-black/30 h-full backdrop-blur-lg rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl border border-white/10 animate-pulse-soft w-full max-w-3xl"
       >
         <div
           class="clock text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white tracking-wider flex items-center justify-center gap-3 sm:gap-5"
@@ -105,7 +129,7 @@
       </div>
     </div>
 
-    <!-- Location button for mobile -->
+    <!-- Location Request Button for Mobile -->
     <button
       onclick="requestLocation()"
       class="fixed bottom-4 right-4 bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg sm:hidden z-50"
@@ -113,6 +137,74 @@
       Enable Location
     </button>
 
+    <!-- Modal -->
+    <div
+      id="weather-modal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-50"
+    >
+      <div
+        class="bg-zinc-900 text-white rounded-xl max-w-md w-[90%] p-6 relative fade-in shadow-2xl border border-white/10"
+      >
+        <button
+          onclick="closeModal()"
+          class="absolute top-2 right-3 text-2xl text-gray-400 hover:text-white"
+        >
+          &times;
+        </button>
+        <h2 class="text-2xl font-bold text-purple-400 mb-4">
+          More Weather Details
+        </h2>
+        <div class="grid grid-cols-2 gap-4 text-sm sm:text-base">
+          <div>
+            <span class="font-semibold">Pressure:</span>
+            <span id="pressure">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Visibility:</span>
+            <span id="visibility">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">UV Index:</span> <span id="uv">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Cloud:</span> <span id="cloud">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Wind Dir:</span>
+            <span id="wind-dir">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Wind Degree:</span>
+            <span id="wind-degree">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Wind Chill:</span>
+            <span id="windchill">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Gust:</span> <span id="gust">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Precipitation:</span>
+            <span id="precipitation">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Dew Point:</span>
+            <span id="dew-point">--</span>
+          </div>
+          <div>
+            <span class="font-semibold">Heat Index:</span>
+            <span id="heat-index">--</span>
+          </div>
+          <div class="col-span-2">
+            <span class="font-semibold">Last Updated:</span>
+            <span id="last-updated">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script -->
     <script src="script.js"></script>
   </body>
 </html>

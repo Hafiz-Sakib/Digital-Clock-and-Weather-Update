@@ -1,6 +1,5 @@
 function updateClock() {
   const now = new Date();
-
   let hours = now.getHours();
   const ampm = hours >= 12 ? "PM" : "AM";
   hours = hours % 12 || 12;
@@ -14,15 +13,14 @@ function updateClock() {
   ).padStart(2, "0");
   document.getElementById("ampm").textContent = ampm;
 
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
   document.getElementById("date").textContent = now.toLocaleDateString(
     "en-US",
-    options
+    {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
   );
 }
 
@@ -36,24 +34,54 @@ async function getWeather(position) {
     const response = await fetch(url);
     const data = await response.json();
 
+    const current = data.current;
+
+    // Main box
     document.getElementById("temperature").textContent = `${Math.round(
-      data.current.temp_c
+      current.temp_c
     )}°C`;
     document.getElementById("weather-desc").textContent =
-      data.current.condition.text;
+      current.condition.text;
     document.getElementById("weather-icon").textContent = getWeatherIcon(
-      data.current.condition.code
+      current.condition.code
     );
     document.getElementById("location").textContent = data.location.name;
     document.getElementById("feels-like").textContent = `${Math.round(
-      data.current.feelslike_c
+      current.feelslike_c
     )}°C`;
     document.getElementById("wind-speed").textContent = `${Math.round(
-      data.current.wind_kph
+      current.wind_kph
     )} km/h`;
+    document.getElementById("humidity").textContent = `${current.humidity}%`;
     document.getElementById(
-      "humidity"
-    ).textContent = `${data.current.humidity}%`;
+      "heatindex"
+    ).textContent = `${current.heatindex_c}°C`;
+
+    // Modal
+    document.getElementById(
+      "pressure"
+    ).textContent = `${current.pressure_mb} hPa`;
+    document.getElementById("visibility").textContent = `${current.vis_km} km`;
+    document.getElementById("uv").textContent = current.uv;
+    document.getElementById("cloud").textContent = `${current.cloud}%`;
+    document.getElementById("wind-dir").textContent = current.wind_dir;
+    document.getElementById(
+      "wind-degree"
+    ).textContent = `${current.wind_degree}°`;
+    document.getElementById(
+      "windchill"
+    ).textContent = `${current.windchill_c}°C`;
+    document.getElementById("gust").textContent = `${current.gust_kph} km/h`;
+    document.getElementById(
+      "precipitation"
+    ).textContent = `${current.precip_mm} mm`;
+    document.getElementById(
+      "dew-point"
+    ).textContent = `${current.dewpoint_c}°C`;
+    document.getElementById(
+      "heat-index"
+    ).textContent = `${current.heatindex_c}°C`;
+    document.getElementById("last-updated").textContent = current.last_updated;
   } catch (error) {
     console.error("Error fetching weather:", error);
     setWeatherUnavailable();
@@ -137,25 +165,24 @@ function requestLocation() {
   }
 }
 
-// Initialize
+function openModal() {
+  document.getElementById("weather-modal").classList.remove("hidden");
+}
+
+function closeModal() {
+  document.getElementById("weather-modal").classList.add("hidden");
+}
+
+// Init
 updateClock();
 setInterval(updateClock, 1000);
 
-// Try cached location first
 const cached = localStorage.getItem("lastLocation");
-if (cached) {
-  const coords = JSON.parse(cached);
-  getWeather({ coords });
-} else {
-  requestLocation();
-}
+if (cached) getWeather({ coords: JSON.parse(cached) });
+else requestLocation();
 
-// Periodic update every 5 minutes
 setInterval(() => {
-  const cachedCoords = localStorage.getItem("lastLocation");
-  if (cachedCoords) {
-    getWeather({ coords: JSON.parse(cachedCoords) });
-  } else {
-    requestLocation();
-  }
+  const coords = localStorage.getItem("lastLocation");
+  if (coords) getWeather({ coords: JSON.parse(coords) });
+  else requestLocation();
 }, 300000);
