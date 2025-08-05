@@ -36,6 +36,7 @@ async function getWeather(position) {
 
     const current = data.current;
 
+    console.log(current);
     // Main box
     document.getElementById("temperature").textContent = `${Math.round(
       current.temp_c
