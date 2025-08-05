@@ -26,7 +26,6 @@ function updateClock() {
 
 async function getWeather(position) {
   const { latitude, longitude } = position.coords;
-  localStorage.setItem("lastLocation", JSON.stringify(position.coords));
   const apiKey = "ba583690a7814b42955190311250408";
   const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${latitude},${longitude}&aqi=no`;
 
@@ -36,7 +35,6 @@ async function getWeather(position) {
 
     const current = data.current;
 
-    console.log(current);
     // Main box
     document.getElementById("temperature").textContent = `${Math.round(
       current.temp_c
@@ -155,14 +153,20 @@ function handleLocationError(error) {
   console.error("Error getting location:", error);
   document.getElementById("weather-desc").textContent =
     "Location access denied";
+  setWeatherUnavailable();
 }
 
 function requestLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(getWeather, handleLocationError);
+    navigator.geolocation.getCurrentPosition(getWeather, handleLocationError, {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    });
   } else {
     document.getElementById("weather-desc").textContent =
       "Geolocation not supported";
+    setWeatherUnavailable();
   }
 }
 
@@ -174,16 +178,14 @@ function closeModal() {
   document.getElementById("weather-modal").classList.add("hidden");
 }
 
-// Init
+// Initialize
 updateClock();
 setInterval(updateClock, 1000);
 
-const cached = localStorage.getItem("lastLocation");
-if (cached) getWeather({ coords: JSON.parse(cached) });
-else requestLocation();
+// Always request fresh location - don't use cached location
+requestLocation();
 
+// Update weather every 5 minutes with fresh location
 setInterval(() => {
-  const coords = localStorage.getItem("lastLocation");
-  if (coords) getWeather({ coords: JSON.parse(coords) });
-  else requestLocation();
-}, 30000);
+  requestLocation();
+}, 300000);
