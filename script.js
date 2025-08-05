@@ -33,9 +33,6 @@ async function getWeather(position) {
   try {
     const response = await fetch(url);
     const data = await response.json();
-    // document.getElementById("location").textContent = data.location.name;
-    const city = data.location.name;
-    console.log("City:", city);
 
     const current = data.current;
 
@@ -189,4 +186,4 @@ setInterval(() => {
   const coords = localStorage.getItem("lastLocation");
   if (coords) getWeather({ coords: JSON.parse(coords) });
   else requestLocation();
-}, 30);
+}, 30000);
